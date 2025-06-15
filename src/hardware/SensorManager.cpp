@@ -29,9 +29,9 @@ void setupSensors() {
 
     if (s.type == "SI1145" && !si1145_initialized) {
       if (!si1145.begin()) {
-        Serial.println("⚠️ Failed to initialize SI1145");
+        Serial.println("Failed to initialize SI1145");
       } else {
-        Serial.println("✅ SI1145 initialized");
+        Serial.println("SI1145 initialized");
         si1145_initialized = true;
       }
     }
