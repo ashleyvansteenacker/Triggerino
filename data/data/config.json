@@ -1,0 +1,111 @@
+{
+  "buttons": [
+    {
+      "pin": 5,
+      "pullup": true,
+      "inverted": false,
+      "debounce_ms": 10,
+      "name": "Scene_1",
+      "description": "Main trigger button"
+    },
+    {
+      "pin": 17,
+      "pullup": true,
+      "inverted": false,
+      "debounce_ms": 10,
+      "name": "Scene_2",
+      "description": "Emergency stop button"
+    }
+  ],
+  "sensors": [],
+  "outputs": [
+    {
+      "type": "artnet",
+      "name": "dmx_controller",
+      "host": "10.10.0.49",
+      "port": 6454,
+      "path": "",
+      "params": {
+        "universe": 0
+      }
+    },
+    {
+      "type": "osc",
+      "name": "osc",
+      "host": "10.10.0.49",
+      "port": 8000,
+      "path": "/trigger",
+      "params": {
+        "bundle": false
+      }
+    },
+    {
+      "type": "http",
+      "name": "lss_anim_2",
+      "host": "10.10.0.18",
+      "port": 80,
+      "path": "/SetAutoplay.html?anim=2",
+      "params": {
+        "method": "GET"
+      }
+    },
+       {
+      "type": "http",
+      "name": "lss_anim_0",
+      "host": "10.10.0.18",
+      "port": 80,
+      "path": "/SetAutoplay.html?anim=0",
+      "params": {
+        "method": "get"
+      }
+    },
+        {
+      "type": "http",
+      "name": "web_service_2",
+      "host": "192.168.1.102",
+      "port": 3000,
+      "path": "/api/trigger",
+      "params": {
+        "method": "POST",
+        "auth": "bearer_token_here"
+      }
+    },
+    {
+      "type": "tcp",
+      "name": "raw_socket",
+      "host": "192.168.1.103",
+      "port": 9999,
+      "path": "",
+      "params": {
+        "format": "json",
+        "keep_alive": true
+      }
+    }
+  ],
+"mappings": [
+  {
+    "input_name": "Scene_2",
+    "input_type": "button",
+    "output_name": "lss_anim_2",
+    "condition": "pressed",
+    "data": {
+      "action": "Scene_2",
+      "priority": "high",
+      "message": "Emergency stop activated"
+    },
+    "trigger_params": {}
+  },
+  {
+  "input_name": "Scene_1",
+  "input_type": "button",
+  "output_name": "dmx_controller",
+  "condition": "pressed",
+  "data": {
+    "universe": 0,
+    "channels": [255, 0, 255, 128, 64]
+  },
+  "trigger_params": {}
+}
+]
+
+}

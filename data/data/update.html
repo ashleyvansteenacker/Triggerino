@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Triggerino - Firmware Update</title>
+  <link rel="stylesheet" href="/triggerino-ui.css">
+  <style>
+    .upload-form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    input[type="file"] {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #progress-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #28a745;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/inputs_live.html">Live Inputs</a>
+    <a href="/input_config.html">Input Config</a>
+    <a href="/wifi.html">Wi-Fi Setup</a>
+    <a href="/system.html">System Info</a>
+    <a href="/update.html">Firmware Update</a>
+  </nav>
+
+  <div class="container">
+    <h1>Firmware Update</h1>
+
+    <form class="upload-form" id="uploadForm">
+      <input type="file" id="firmware" accept=".bin" required>
+      <button type="submit">Upload & Flash</button>
+
+      <div id="progress-container">
+        <div id="progress-bar">
+          <div id="progress-bar-fill"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('firmware');
+      const progressContainer = document.getElementById('progress-container');
+      const progressBarFill = document.getElementById('progress-bar-fill');
+
+      if (!fileInput.files.length) {
+        alert("Please select a firmware file (.bin)");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", function(e) {
+        if (e.lengthComputable) {
+          const percent = (e.loaded / e.total) * 100;
+          progressContainer.style.display = 'block';
+          progressBarFill.style.width = percent + "%";
+        }
+      });
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+          if (xhr.status == 200 && xhr.responseText.trim() === "OK") {
+            alert("Firmware Uploaded! Rebooting...");
+            setTimeout(() => location.reload(), 5000);
+          } else {
+            alert("Firmware upload failed!");
+          }
+        }
+      };
+
+      xhr.open("POST", "/update", true);
+      xhr.send(file);
+    });
+  </script>
+</body>
+</html>

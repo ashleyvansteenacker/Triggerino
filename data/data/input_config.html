@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Triggerino</title>
+  <link rel="stylesheet" href="/triggerino-ui.css">
+  <style>
+    .save-button {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+    }
+    .conditional-field { display: none; }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<header></header>
+<main class="container">
+  <h1>Triggerino Input Configuration</h1>
+  <div class="grid" id="configCards">
+    <div class="card">
+      <div class="small-label">Device IP</div>
+      <div id="device-ip" class="big-value">--</div>
+    </div>
+  </div>
+  <div class="save-button">
+    <button class="button" onclick="saveConfig()">Save Configuration</button>
+  </div>
+</main>
+<footer>
+  <div class="footer-content">
+    <p>Triggerino &copy; 2025. All rights reserved.</p>
+    <p><a href="https://ashl.ee/triggerino" target="_blank">Made with ❤️ by ash.ee</a></p>
+  </div>
+</footer>
+<script>
+function createExtraFields(index) {
+  return `
+    <div class="conditional-field http-fields" id="http-fields-${index}">
+      <label for="httpurl-${index}">HTTP URL Template</label>
+      <input type="text" id="httpurl-${index}" placeholder="e.g. http://device/api?val={{value}}">
+      <label for="preset-${index}">HTTP Preset</label>
+      <select id="preset-${index}" onchange="applyHttpPreset(${index})">
+        <option value="">-- Select a preset --</option>
+        <option value="ledstripstudio">LED Strip Studio</option>
+        <option value="colorlight">Colorlight A35/100</option>
+        <option value="madrix">Madrix HTTP Trigger</option>
+      </select>
+    </div>
+    <div class="conditional-field artnet-fields" id="artnet-fields-${index}">
+      <label for="universe-${index}">Art-Net Universe</label>
+      <input type="number" id="universe-${index}" min="0" max="32767">
+      <label for="address-${index}">Start Channel</label>
+      <input type="number" id="address-${index}" min="1" max="512">
+    </div>
+    <label for="output-mode-${index}" style="margin-top:10px;">Output Mode</label>
+    <select id="output-mode-${index}" onchange="onOutputModeChange(${index})">
+      <option value="live">Send live value</option>
+      <option value="static">Send static value</option>
+      <option value="toggle">Send X/Y on trigger</option>
+    </select>
+    <div class="conditional-field" id="output-static-${index}">
+      <label for="static-${index}">Static Output Value</label>
+      <input type="number" id="static-${index}" placeholder="e.g. 100">
+    </div>
+    <div class="conditional-field" id="output-toggle-${index}">
+      <label for="value-on-${index}">Value when triggered</label>
+      <input type="number" id="value-on-${index}" placeholder="e.g. 255">
+      <label for="value-off-${index}">Value when not triggered</label>
+      <input type="number" id="value-off-${index}" placeholder="e.g. 0">
+    </div>
+  `;
+}
+
+function applyHttpPreset(index) {
+  const preset = document.getElementById(`preset-${index}`).value;
+  const ip = document.getElementById(`ip-${index}`).value;
+  const urlInput = document.getElementById(`httpurl-${index}`);
+  let host = ip || "controller";
+
+  if (preset === 'ledstripstudio') urlInput.value = `http://${host}/trigger_scene?id={{value}}`;
+  if (preset === 'colorlight') urlInput.value = `http://${host}/device/scene/{{value}}`;
+  if (preset === 'madrix') urlInput.value = `http://${host}/api/trigger/{{value}}`;
+}
+
+function onLogicChange(index) {
+  const logic = document.getElementById(`logic-${index}`).value;
+  document.getElementById(`between-fields-${index}`).style.display = logic === 'between' ? 'block' : 'none';
+}
+
+function onActionChange(index) {
+  const action = document.getElementById(`action-${index}`).value;
+  document.querySelector(`#http-fields-${index}`).style.display = action === 'http' ? 'block' : 'none';
+  document.querySelector(`#artnet-fields-${index}`).style.display = action === 'artnet' ? 'block' : 'none';
+}
+
+function onOutputModeChange(index) {
+  document.getElementById(`output-static-${index}`).style.display = 'none';
+  document.getElementById(`output-toggle-${index}`).style.display = 'none';
+  const mode = document.getElementById(`output-mode-${index}`).value;
+  if (mode === 'static') document.getElementById(`output-static-${index}`).style.display = 'block';
+  if (mode === 'toggle') document.getElementById(`output-toggle-${index}`).style.display = 'block';
+}
+
+let inputs = [];
+function loadConfig() {
+  fetch("/input_config")
+    .then(res => res.json())
+    .then(data => {
+      inputs = data;
+      const container = document.getElementById('configCards');
+      container.innerHTML = "";
+      data.forEach((input, index) => {
+        const card = document.createElement('div');
+        card.className = "card";
+        card.innerHTML = `
+          <h2>Input ${index + 1}</h2>
+          <label for="mode-${index}">Mode</label>
+          <select id="mode-${index}">
+            <option value="digital">Digital</option>
+            <option value="analog">Analog</option>
+            <option value="pwm">PWM</option>
+          </select>
+
+          <label for="action-${index}">Action</label>
+          <select id="action-${index}" onchange="onActionChange(${index})">
+            <option value="http">HTTP</option>
+            <option value="artnet">Art-Net</option>
+            <option value="osc">OSC</option>
+            <option value="tcp">TCP</option>
+          </select>
+
+          <label for="ip-${index}">Target IP</label>
+          <input type="text" id="ip-${index}" value="${input.target_ip}">
+
+          <label for="port-${index}">Target Port</label>
+          <input type="number" id="port-${index}" value="${input.target_port}">
+
+          <label for="threshold-${index}">Threshold</label>
+          <input type="number" id="threshold-${index}" value="${input.threshold}">
+
+          <label for="logic-${index}">Logic</label>
+          <select id="logic-${index}" onchange="onLogicChange(${index})">
+            <option value="greater">Greater than threshold</option>
+            <option value="less">Less than threshold</option>
+            <option value="equal">Equal to threshold</option>
+            <option value="between">Between range</option>
+            <option value="always">Always trigger</option>
+          </select>
+
+          <div id="between-fields-${index}" style="display:none; margin-top:10px;">
+            <label for="low-${index}">Low Value</label>
+            <input type="number" id="low-${index}" value="${input.range_low || 0}">
+            <label for="high-${index}">High Value</label>
+            <input type="number" id="high-${index}" value="${input.range_high || 0}">
+          </div>
+
+          ${createExtraFields(index)}
+        `;
+        container.appendChild(card);
+        document.getElementById(`mode-${index}`).value = input.mode;
+        document.getElementById(`action-${index}`).value = input.action;
+        document.getElementById(`logic-${index}`).value = input.logic_type || 'greater';
+        onLogicChange(index);
+        onActionChange(index);
+        document.getElementById(`output-mode-${index}`).value = input.output_mode || 'live';
+        onOutputModeChange(index);
+        document.getElementById(`static-${index}`).value = input.static_value ?? '';
+        document.getElementById(`value-on-${index}`).value = input.value_on ?? '';
+        document.getElementById(`value-off-${index}`).value = input.value_off ?? '';
+      });
+    });
+}
+
+function saveConfig() {
+  inputs.forEach((input, index) => {
+    input.mode = document.getElementById(`mode-${index}`).value;
+    input.action = document.getElementById(`action-${index}`).value;
+    input.target_ip = document.getElementById(`ip-${index}`).value;
+    input.target_port = parseInt(document.getElementById(`port-${index}`).value) || 0;
+    input.threshold = parseInt(document.getElementById(`threshold-${index}`).value) || 0;
+    input.logic_type = document.getElementById(`logic-${index}`).value;
+    input.range_low = parseInt(document.getElementById(`low-${index}`)?.value || 0);
+    input.range_high = parseInt(document.getElementById(`high-${index}`)?.value || 0);
+    input.http_url = document.getElementById(`httpurl-${index}`)?.value || "";
+    input.universe = parseInt(document.getElementById(`universe-${index}`)?.value || 0);
+    input.address = parseInt(document.getElementById(`address-${index}`)?.value || 1);
+    input.output_mode = document.getElementById(`output-mode-${index}`).value;
+    input.static_value = parseInt(document.getElementById(`static-${index}`)?.value || 0);
+    input.value_on = parseInt(document.getElementById(`value-on-${index}`)?.value || 0);
+    input.value_off = parseInt(document.getElementById(`value-off-${index}`)?.value || 0);
+  });
+
+  fetch("/input_config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(inputs)
+  })
+  .then(response => {
+    if (response.ok) {
+      alert("Configuration Saved ✅");
+    } else {
+      alert("Failed to save!");
+    }
+  });
+}
+
+loadConfig();
+</script>
+</body>
+</html>

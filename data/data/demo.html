@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Triggerino UI Demo</title>
+  <link rel="stylesheet" href="/triggerino-ui.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="brand">
+  <img src="data:image/png;base64,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" alt="Triggerino Logo" style="height: 30px; vertical-align: middle; margin-right: 8px;">
+</div>
+
+    
+    <button class="navbar-toggler" type="button" onclick="toggleMenu()">
+      <div class="navbar-toggler-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+    
+    <div class="navbar-collapse" id="navbarContent">
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/inputs_live.html">Live Inputs</a>
+        <a href="/input_config.html">Inputs Config</a>
+        <a href="/wifi.html">Wi-Fi Setup</a>
+      </nav>
+      <div class="theme-toggle-container">
+        <button id="themeToggle" class="toggle-theme" onclick="toggleTheme()">🌙 Dark</button>
+      </div>
+      
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Triggerino UI Demo</h1>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Buttons</h2>
+      <button class="button" onclick="showToast('Button Clicked!')">Click Me</button>
+    </div>
+
+    <div class="card">
+      <h2>Inputs</h2>
+      <input type="text" placeholder="Text input">
+      <input type="number" placeholder="Number input">
+      <select>
+        <option>Option 1</option>
+        <option>Option 2</option>
+      </select>
+      <input type="range" class="slider">
+      <div class="checkbox">
+        <label><input type="checkbox"> Enable something</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Toast Notification</h2>
+      <div id="toast" class="toast" style="display:none;">This is a Toast!</div>
+    </div>
+
+    <div class="card">
+      <h2>Progress Bar</h2>
+      <div class="progress">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Table</h2>
+      <table>
+        <tr><th>Name</th><th>Value</th></tr>
+        <tr><td>Input 1</td><td>ON</td></tr>
+        <tr><td>Input 2</td><td>OFF</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Modal</h2>
+      <button class="button" onclick="openModal()">Open Modal</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="modal" onclick="closeModal()">
+  <div class="modal-content">
+    <h2>Hello!</h2>
+    <p>This is a simple modal popup.</p>
+    <button class="button" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-content">
+    <p>Triggerino &copy; 2025. All rights reserved.</p>
+    <p><a href="https://ashl.ee/triggerino" target="_blank">Made with ❤️ by ash.ee</a></p>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() {
+  document.getElementById('navbarContent').classList.toggle('show');
+}
+
+function toggleTheme() {
+  if (document.documentElement.getAttribute('data-theme') === 'dark') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+}
+
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  toast.innerText = text;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 2000);
+}
+
+function openModal() {
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function toggleTheme() {
+  const btn = document.getElementById('themeToggle');
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  let newTheme;
+
+  if (currentTheme === 'dark') {
+    newTheme = 'light';
+    document.documentElement.removeAttribute('data-theme');
+    btn.innerHTML = "🌙 Dark";
+  } else {
+    newTheme = 'dark';
+    document.documentElement.setAttribute('data-theme', 'dark');
+    btn.innerHTML = "☀️ Light";
+  }
+
+  localStorage.setItem('triggerinoTheme', newTheme);
+}
+
+// Load theme when page loads
+window.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('triggerinoTheme');
+  const btn = document.getElementById('themeToggle');
+
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (btn) btn.innerHTML = "☀️ Light";
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    if (btn) btn.innerHTML = "🌙 Dark";
+  }
+});
+
+
+</script>
+
+</body>
+</html>

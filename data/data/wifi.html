@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triggerino Wi-Fi Setup</title>
+  <style>
+    body { font-family: sans-serif; background: #f8f9fa; margin: 0; padding: 2rem; }
+    h1 { color: #333; }
+    label { display: block; margin-top: 1rem; color: #555; }
+    select, input[type="text"], input[type="password"] { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+    button { margin-top: 2rem; padding: 0.7rem 1.5rem; font-size: 1rem; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; }
+    button:hover { background: #0056b3; }
+    #message { margin-top: 1rem; color: green; }
+  </style>
+</head>
+<body>
+
+  <h1>Triggerino Wi-Fi Setup</h1>
+
+  <label for="ssid">Wi-Fi Network</label>
+  <select id="ssid-select">
+    <option value="">-- Scanning networks... --</option>
+  </select>
+
+  <label for="ssid-manual">Or enter SSID manually:</label>
+  <input type="text" id="ssid-manual" placeholder="SSID">
+
+  <label for="password">Wi-Fi Password</label>
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="saveWifi()">Save and Reboot</button>
+
+  <div id="message"></div>
+
+  <script>
+async function scanWifi() {
+  try {
+    const res = await fetch('/network_scan');
+    const data = await res.json();
+    console.log(data);
+    
+    const select = document.getElementById('ssid-select');
+    select.innerHTML = '<option value="">-- Select network --</option>';
+    
+    if (data.networks && Array.isArray(data.networks)) {
+      // Just get unique SSIDs
+      const uniqueSSIDs = [...new Set(data.networks.map(n => n.ssid).filter(ssid => ssid !== ''))];
+      
+      uniqueSSIDs.forEach(ssid => {
+        const opt = document.createElement('option');
+        opt.value = ssid;
+        opt.textContent = ssid;
+        select.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('Wi-Fi scan failed', err);
+    const select = document.getElementById('ssid-select');
+    select.innerHTML = '<option value="">(Scan failed)</option>';
+  }
+}
+
+    async function saveWifi() {
+      const selectedSSID = document.getElementById('ssid-select').value;
+      const manualSSID = document.getElementById('ssid-manual').value.trim();
+      const password = document.getElementById('password').value;
+
+      const ssid = manualSSID.length > 0 ? manualSSID : selectedSSID;
+
+      if (!ssid) {
+        document.getElementById('message').textContent = 'Please select or enter an SSID.';
+        return;
+      }
+
+      const body = JSON.stringify({ ssid: ssid, password: password });
+      try {
+        const res = await fetch('/save_wifi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
+        });
+        const text = await res.text();
+        document.getElementById('message').textContent = text;
+      } catch (err) {
+        console.error('Save failed', err);
+        document.getElementById('message').textContent = 'Save failed!';
+      }
+    }
+
+    scanWifi();
+  </script>
+
+</body>
+</html>
